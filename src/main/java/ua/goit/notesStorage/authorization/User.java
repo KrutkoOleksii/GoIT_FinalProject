@@ -4,7 +4,6 @@ import ua.goit.notesStorage.BaseEntity;
 import ua.goit.notesStorage.Note.Note;
 import ua.goit.notesStorage.enums.Role;
 import lombok.*;
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,13 +13,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 @Data
-@Getter
-@Setter
 @EqualsAndHashCode(exclude = "notes")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -63,19 +59,6 @@ public class User implements BaseEntity<UUID>, UserDetails {
 
     public boolean isAdmin(){
         return roles.contains(Role.ADMIN);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        User user = (User) o;
-        return id != null && Objects.equals(id, user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
     }
 
     @Override
