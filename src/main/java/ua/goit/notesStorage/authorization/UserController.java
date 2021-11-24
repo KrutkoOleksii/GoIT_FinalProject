@@ -1,6 +1,5 @@
 package ua.goit.notesStorage.authorization;
 
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import ua.goit.notesStorage.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -74,11 +73,6 @@ public class UserController {
         }
         model.addAttribute("message",error);
         return new ModelAndView("error");
-    }
-    @ExceptionHandler(InternalAuthenticationServiceException.class)
-    ModelAndView onAuthenticationException(InternalAuthenticationServiceException e, Model model) {
-        model.addAttribute("message", "The username or password are not correct!");
-        return new ModelAndView("login");
     }
 
 }

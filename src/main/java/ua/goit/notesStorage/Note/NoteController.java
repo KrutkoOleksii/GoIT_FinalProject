@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.validation.Valid;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.*;
@@ -32,9 +31,9 @@ public class NoteController {
         List<Note> notes;
         if (filter != null || !filter.isEmpty()) {
             user = userService.getById(user.getId());
-            notes = noteService.getAuthorNotes(user.getId());
+            notes = noteService.findByAuthor(user.getId());
         } else {
-            notes = noteService.getAuthorNotes(user.getId());
+            notes = noteService.findByAuthor(user.getId());
         }
         int noteCount= notes.size();
         model.put("notes", notes);
