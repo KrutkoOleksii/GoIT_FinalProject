@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.validation.Valid;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.*;
@@ -32,9 +31,9 @@ public class NoteController {
         List<Note> notes;
         if (filter != null || !filter.isEmpty()) {
             user = userService.getById(user.getId());
-            notes = noteService.getAuthorNotes(user.getId());
+            notes = noteService.findByAuthor(user.getId());
         } else {
-            notes = noteService.getAuthorNotes(user.getId());
+            notes = noteService.findByAuthor(user.getId());
         }
         int noteCount= notes.size();
         model.put("notes", notes);
@@ -85,7 +84,7 @@ public class NoteController {
     @GetMapping("share/{id}")
     public String noteShow(@AuthenticationPrincipal User user,@PathVariable String id, Map<String,Object> model){
         Optional<Note> note = noteService.findById(UUID.fromString(id));
-        if ((!note.isEmpty() && ((user!=null && note.get().getAuthor().getId().equals(user.getId())) ||
+        if ((note.isPresent() && ((user!=null && note.get().getAuthor().getId().equals(user.getId())) ||
                 (user == null && note.get().getAccessType().equals(AccessTypes.PUBLIC))))){
         model.put("note", note.get());
         } else {
@@ -98,8 +97,7 @@ public class NoteController {
     public String addNote(@AuthenticationPrincipal User user,
                           @ModelAttribute("editNote") Note editNote,
                           @RequestParam(required = false) String noteId,
-                          @RequestParam(required = false) String accessType,
-                          Map<String, Object> model){
+                          @RequestParam(required = false) String accessType){
         if (!noteId.isBlank()) {
             editNote.setId(UUID.fromString(noteId));
             editNote.setAccessType(AccessTypes.valueOf(accessType.toUpperCase()));

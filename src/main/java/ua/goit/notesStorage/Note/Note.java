@@ -11,11 +11,9 @@ import javax.validation.constraints.*;
 import java.util.UUID;
 
 @Data
-@Getter
-@Setter
 @ToString(exclude = "author")
 @EqualsAndHashCode(exclude = "author")
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
@@ -44,6 +42,10 @@ public class Note implements BaseEntity<UUID> {
     @Enumerated(EnumType.STRING)
     private AccessTypes accessType;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User author;
+
     public String getAuthorName(){
         return author != null ? author.getUsername() : "";
     }
@@ -53,15 +55,6 @@ public class Note implements BaseEntity<UUID> {
         this.message = message;
         this.accessType = accessType;
         this.id = UUID.fromString(id);
-    }
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
-    private User author;
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
     }
 
 }

@@ -11,9 +11,11 @@
                 <!--<li class="nav-item">
                     <a class="nav-link" aria-current="page" href="/">Home</a>
                 </li>-->
+                <#if user??>
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="/note/list">My Notes</a>
                 </li>
+                </#if>
                 <#if isAdmin>
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="/users">User list</a>

@@ -1,9 +1,5 @@
 package ua.goit.notesStorage.App;
 
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.ModelAndView;
 import ua.goit.notesStorage.Note.Note;
 import ua.goit.notesStorage.Note.NoteRepository;
 import ua.goit.notesStorage.authorization.User;
@@ -17,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Map;
 
 @Controller
-//@RestController
 public class MainController {
 
     @Autowired
