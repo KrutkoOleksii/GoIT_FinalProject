@@ -1,5 +1,6 @@
 package ua.goit.notesStorage.Note;
 
+import lombok.AllArgsConstructor;
 import ua.goit.notesStorage.authorization.User;
 import ua.goit.notesStorage.authorization.UserService;
 import ua.goit.notesStorage.enums.AccessTypes;
@@ -14,27 +15,24 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.*;
+import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Validated
 @Controller
 @RequestMapping(value = "/note")
 public class NoteController {
 
-    @Autowired
-    private NoteService noteService;
-
-    @Autowired
-    private UserService userService;
+    private final NoteService noteService;
+    private final UserService userService;
 
     @GetMapping("list")
     public String getNotes(@AuthenticationPrincipal User user,@RequestParam(required = false,defaultValue = "") String filter, Map<String, Object> model){
         List<Note> notes;
-        if (filter != null || !filter.isEmpty()) {
+        if (filter != null && !filter.isEmpty()) {
             user = userService.getById(user.getId());
-            notes = noteService.findByAuthor(user.getId());
-        } else {
-            notes = noteService.findByAuthor(user.getId());
         }
+        notes = noteService.findByAuthor(user.getId());
         int noteCount= notes.size();
         model.put("notes", notes);
         model.put("filter", filter);
@@ -51,14 +49,10 @@ public class NoteController {
     public String noteEdit(@AuthenticationPrincipal User user, @PathVariable String id,  Map<String, Object> model){
         Note note = noteService.getById(UUID.fromString(id));
         if (!note.getAuthor().getId().equals(user.getId())){
-            List<String> message = new ArrayList<>();
-            message.add("Editing the note is prohibited - you are not author");
-            model.put("message", message);
+            model.put("message", Collections.singletonList("Editing the note is prohibited - you are not author"));
             return "noteError";
         }
-        if (note != null){
-            model.put("editNote", note);
-        }
+        model.put("editNote", note);
         return "noteEdit";
     }
 
@@ -66,9 +60,7 @@ public class NoteController {
     public String noteDelete(@AuthenticationPrincipal User user,@PathVariable String id, Map<String, Object> model){
         Note note = noteService.getById(UUID.fromString(id));
         if (!note.getAuthor().getId().equals(user.getId())){
-            List<String> message = new ArrayList<>();
-            message.add("Deleting the note is prohibited - you are not author");
-            model.put("message", message);
+            model.put("message", Collections.singletonList("Deleting the note is prohibited - you are not author"));
             return "noteError";
         }
         noteService.deleteById(UUID.fromString(id));
@@ -77,7 +69,7 @@ public class NoteController {
 
     @GetMapping("error")
     public String noteError(Map<String, Object> model){
-        model.put("message", "TEST MESSAGE!"); //for view testing
+        model.put("message", Collections.singletonList("TEST MESSAGE!")); //for view testing
         return "noteError";
     }
 
@@ -88,7 +80,7 @@ public class NoteController {
                 (user == null && note.get().getAccessType().equals(AccessTypes.PUBLIC))))){
         model.put("note", note.get());
         } else {
-            model.put("message", "We can't find tis note ");
+            model.put("message", Collections.singletonList("We can't find tis note "));
         }
         return "noteShow";
     }
@@ -109,12 +101,9 @@ public class NoteController {
 
     @ExceptionHandler({ConstraintViolationException.class})
     ModelAndView onConstraintValidationException(ConstraintViolationException e, Model model) {
-        List<String> error = new ArrayList<>();
-        Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-        for (ConstraintViolation<?> violation : violations){
-            error.add(violation.getMessage());
-        }
-        model.addAttribute("message",error);
+        model.addAttribute("message",e.getConstraintViolations().stream()
+                        .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList()));
         return new ModelAndView("noteError");
     }
 }

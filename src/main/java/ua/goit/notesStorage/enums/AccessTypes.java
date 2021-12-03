@@ -1,9 +1,12 @@
 package ua.goit.notesStorage.enums;
 
+import lombok.AllArgsConstructor;
+
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Optional;
 
+@AllArgsConstructor
 @NotNull
 public enum AccessTypes {
 
@@ -12,10 +15,6 @@ public enum AccessTypes {
 
     @NotNull
     private final String accessType;
-
-    AccessTypes(String accessType) {
-        this.accessType = accessType;
-    }
 
     public String getAccessType() {
         return accessType;
