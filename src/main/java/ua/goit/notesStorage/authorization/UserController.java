@@ -66,12 +66,9 @@ public class UserController {
     }
     @ExceptionHandler(ConstraintViolationException.class)
     ModelAndView onConstraintValidationException(ConstraintViolationException e, Model model) {
-        List<String> error = new ArrayList<>();
-        Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-        for (ConstraintViolation<?> violation : violations){
-            error.add(violation.getMessage());
-        }
-        model.addAttribute("message",error);
+        model.addAttribute("message",e.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList()));
         return new ModelAndView("error");
     }
 
