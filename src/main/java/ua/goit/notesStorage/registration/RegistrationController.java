@@ -1,10 +1,9 @@
 package ua.goit.notesStorage.registration;
 
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import lombok.AllArgsConstructor;
 import ua.goit.notesStorage.authorization.User;
 import ua.goit.notesStorage.authorization.UserService;
 import ua.goit.notesStorage.enums.Role;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,16 +18,15 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Validated
 @Controller
 public class RegistrationController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/register")
     public String registration(Model model){
@@ -38,9 +36,7 @@ public class RegistrationController {
     @PostMapping("/register")
     public String addUser(@Valid User user, BindingResult bindingResult, Model model){
         if (userService.findByUsername(user.getUsername()).isPresent()){
-            List<String> message = new ArrayList<>();
-            message.add("User exists!");
-            model.addAttribute("message", message);
+            model.addAttribute("message", Collections.singletonList("User exists!"));
             return "register";
         }
         user.setActive(true);
@@ -52,12 +48,9 @@ public class RegistrationController {
 
     @ExceptionHandler(ConstraintViolationException.class)
     ModelAndView onConstraintValidationException(ConstraintViolationException e, Model model) {
-        List<String> error = new ArrayList<>();
-        Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-        for (ConstraintViolation<?> violation : violations){
-            error.add(violation.getMessage());
-        }
-        model.addAttribute("message",error);
+        model.addAttribute("message",e.getConstraintViolations().stream()
+                        .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList()));
         return new ModelAndView("/register");
     }
 }
