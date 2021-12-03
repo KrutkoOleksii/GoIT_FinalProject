@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Validated
 @Controller
@@ -29,12 +30,10 @@ public class NoteController {
     @GetMapping("list")
     public String getNotes(@AuthenticationPrincipal User user,@RequestParam(required = false,defaultValue = "") String filter, Map<String, Object> model){
         List<Note> notes;
-        if (filter != null || !filter.isEmpty()) {
+        if (filter != null && !filter.isEmpty()) {
             user = userService.getById(user.getId());
-            notes = noteService.findByAuthor(user.getId());
-        } else {
-            notes = noteService.findByAuthor(user.getId());
         }
+        notes = noteService.findByAuthor(user.getId());
         int noteCount= notes.size();
         model.put("notes", notes);
         model.put("filter", filter);
@@ -56,9 +55,7 @@ public class NoteController {
             model.put("message", message);
             return "noteError";
         }
-        if (note != null){
-            model.put("editNote", note);
-        }
+        model.put("editNote", note);
         return "noteEdit";
     }
 
@@ -109,12 +106,9 @@ public class NoteController {
 
     @ExceptionHandler({ConstraintViolationException.class})
     ModelAndView onConstraintValidationException(ConstraintViolationException e, Model model) {
-        List<String> error = new ArrayList<>();
-        Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-        for (ConstraintViolation<?> violation : violations){
-            error.add(violation.getMessage());
-        }
-        model.addAttribute("message",error);
+        model.addAttribute("message",e.getConstraintViolations().stream()
+                        .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList()));
         return new ModelAndView("noteError");
     }
 }
