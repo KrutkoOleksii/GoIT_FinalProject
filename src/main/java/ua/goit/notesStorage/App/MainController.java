@@ -1,9 +1,9 @@
 package ua.goit.notesStorage.App;
 
+import lombok.AllArgsConstructor;
 import ua.goit.notesStorage.Note.Note;
 import ua.goit.notesStorage.Note.NoteRepository;
 import ua.goit.notesStorage.authorization.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
+@AllArgsConstructor
 @Controller
 public class MainController {
 
-    @Autowired
-    private NoteRepository noteRepository;
+    private final NoteRepository noteRepository;
 
     @GetMapping("/")
     public Object greeting(Map<String, Object> model) {

@@ -1,7 +1,7 @@
 package ua.goit.notesStorage.authorization;
 
+import lombok.AllArgsConstructor;
 import ua.goit.notesStorage.enums.Role;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,13 +13,13 @@ import javax.validation.ConstraintViolationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Controller
 @RequestMapping(value = "/users")
 @PreAuthorize("hasAuthority('ADMIN')") //When admin exists
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping
     public Object userList(Model model){
